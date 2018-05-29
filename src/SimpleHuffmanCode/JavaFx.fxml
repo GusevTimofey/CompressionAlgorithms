@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<AnchorPane prefHeight="451.0" prefWidth="815.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SimpleHuffmanCode.GUI">
+    <children>
+        <Button fx:id="CoderDoCode" layoutX="69.0" layoutY="234.0" mnemonicParsing="false" onAction="#doCode" prefHeight="52.0" prefWidth="201.0" text="Coder" />
+        <Button fx:id="DecoderDoDecode" layoutX="478.0" layoutY="234.0" mnemonicParsing="false" onAction="#doDecode" prefHeight="52.0" prefWidth="201.0" text="Decoder" />
+        <Label layoutX="69.0" layoutY="46.0" text="Choose file for coding/decoding:" />
+        <Label layoutX="69.0" layoutY="177.0" text="Choose operation:" />
+        <Label layoutX="69.0" layoutY="203.0" text="Coder - you will compress your file." />
+        <TextField fx:id="InputFile" layoutX="69.0" layoutY="69.0" prefHeight="27.0" prefWidth="612.0" />
+        <TextField fx:id="OutputFile" layoutX="69.0" layoutY="137.0" prefHeight="27.0" prefWidth="612.0" />
+        <Label layoutX="69.0" layoutY="109.0" text="Choose output file's path:" />
+        <Button fx:id="chooserOne" layoutX="693.0" layoutY="69.0" mnemonicParsing="false" onAction="#chooseFirstFile" text="Choose" />
+        <Button fx:id="chooserTwo" layoutX="693.0" layoutY="137.0" mnemonicParsing="false" onAction="#chooseSecondFile" text="Choose" />
+        <TextField fx:id="codedLength" editable="false" layoutX="69.0" layoutY="336.0" prefHeight="27.0" prefWidth="201.0" />
+        <TextField fx:id="decodedLength" editable="false" layoutX="478.0" layoutY="336.0" prefHeight="27.0" prefWidth="201.0" />
+        <TextField fx:id="coderDone" editable="false" layoutX="69.0" layoutY="384.0" prefHeight="27.0" prefWidth="201.0" />
+        <TextField fx:id="decoderDone" editable="false" layoutX="478.0" layoutY="384.0" prefHeight="27.0" prefWidth="201.0" />
+        <Label layoutX="69.0" layoutY="306.0" text="Coded file's length:" />
+        <Label layoutX="478.0" layoutY="306.0" text="Decoded file's length:" />
+        <Label layoutX="478.0" layoutY="203.0" text="Decoder - you will decompress your file." />
+        <TextField fx:id="InputFieldLength" editable="false" layoutX="292.0" layoutY="260.0" />
+        <TextField fx:id="percentsOfCompression" layoutX="292.0" layoutY="336.0" />
+        <Label layoutX="292.0" layoutY="234.0" text="Input file length:" />
+        <Label layoutX="292.0" layoutY="306.0" text="Compressed on:" />
+    </children>
+</AnchorPane>
