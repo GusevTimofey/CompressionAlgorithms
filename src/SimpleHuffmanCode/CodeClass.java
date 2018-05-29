@@ -32,14 +32,6 @@ public class CodeClass {
         this.fileOutputStream = fileOutputStream;
     }
 
-    public Map<Byte, Integer> getMapForFrequency() {
-        return mapForFrequency;
-    }
-
-    public void setMapForFrequency(Map<Byte, Integer> mapForFrequency) {
-        this.mapForFrequency = mapForFrequency;
-    }
-
     public Map<Byte, BitArray> getMap() {
         return map;
     }
@@ -107,7 +99,6 @@ public class CodeClass {
     }
 
     private void setBitCode(Node node) {
-
         if (node != null) {
             if (node.getLeft() != null) {
                 List<Boolean> codeList = new ArrayList<>(node.getCodeList());

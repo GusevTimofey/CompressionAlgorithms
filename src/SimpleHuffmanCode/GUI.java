@@ -1,6 +1,7 @@
 package SimpleHuffmanCode;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import sun.security.util.BitArray;
 
@@ -15,6 +16,7 @@ import java.util.Map;
 public class GUI extends Component {
     private String firstFile;
     private String secondFile;
+    Map<Byte, BitArray> map;
 
     @FXML
     private TextField InputFile;
@@ -69,6 +71,7 @@ public class GUI extends Component {
         printInputFileLength(a);
 
         coder.setMap(coder.doCOdeSymbolsMap(a));
+        map = coder.doCOdeSymbolsMap(a);
         List<Boolean> codeList = new ArrayList<>(a.length);
         for (byte anArray : a) {
             for (Map.Entry newMap : coder.getMap().entrySet()) {
@@ -113,6 +116,7 @@ public class GUI extends Component {
     @FXML
     private void doDecode() throws IOException {
         CodeClass decoder = new CodeClass(firstFile, secondFile);
+        decoder.setMap(map);
         byte[] array = decoder.getFileInputStream().readAllBytes();
         decoder.getFileInputStream().close();
 
