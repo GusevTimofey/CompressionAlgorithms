@@ -25,13 +25,13 @@ public class GUI extends Component {
     @FXML
     private TextField codedLength;
     @FXML
-    private TextField InputFilelEngth;
+    private TextField InputFieldLength;
     @FXML
     private TextField percentsOfCompression;
 
     @FXML
     private void printInputFileLength(File file) {
-        InputFilelEngth.setText(String.valueOf(file.length() / 1024) + " bytes");
+        InputFieldLength.setText(String.valueOf(file.length() / 1024) + " bytes");
     }
 
     @FXML

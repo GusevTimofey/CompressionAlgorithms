@@ -22,7 +22,7 @@
         <Label layoutX="69.0" layoutY="306.0" text="Coded file's length:" />
         <Label layoutX="478.0" layoutY="306.0" text="Decoded file's length:" />
         <Label layoutX="478.0" layoutY="203.0" text="Decoder - you will decompress your file." />
-        <TextField fx:id="InputFilelEngth" editable="false" layoutX="292.0" layoutY="260.0" />
+        <TextField fx:id="InputFieldLength" editable="false" layoutX="292.0" layoutY="260.0" />
         <TextField fx:id="percentsOfCompression" layoutX="292.0" layoutY="336.0" />
         <Label layoutX="292.0" layoutY="234.0" text="Input file length:" />
         <Label layoutX="292.0" layoutY="306.0" text="Compressed on:" />
