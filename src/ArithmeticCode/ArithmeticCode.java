@@ -1,8 +1,6 @@
 package ArithmeticCode;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
@@ -20,119 +18,23 @@ public class ArithmeticCode {
     private List<Boolean> encodedBits;
     private List<Integer> decodedBytes;
 
-    private FileInputStream fileInputStream;
-    private FileOutputStream fileOutputStream;
-
-    public int getBITS() {
-        return BITS;
+    public int[] encode(int[] in_bytes) {
+        encodedBits = new ArrayList<>();
+        border_L = 0;
+        border_H = (1 << BITS) - 1;
+        add_bits = 0;
+        freq = build_tree(END + 1);
+        for (int data : in_bytes)
+            code_char(data);
+        code_char(END);
+        outputBit(true);
+        int[] result = new int[encodedBits.size()];
+        for (int i = 0; i < result.length; i++)
+            result[i] = encodedBits.get(i) ? 1 : 0;
+        return result;
     }
 
-    public int getHIGHEST_BIT() {
-        return HIGHEST_BIT;
-    }
-
-    public int getMASK() {
-        return MASK;
-    }
-
-    public int getEND() {
-        return END;
-    }
-
-    public int getAdd_bits() {
-        return add_bits;
-    }
-
-    public void setAdd_bits(int add_bits) {
-        this.add_bits = add_bits;
-    }
-
-    public long getValue() {
-        return value;
-    }
-
-    public void setValue(long value) {
-        this.value = value;
-    }
-
-    public int[] getFreq() {
-        return freq;
-    }
-
-    public void setFreq(int[] freq) {
-        this.freq = freq;
-    }
-
-    public int[] getBits() {
-        return bits;
-    }
-
-    public void setBits(int[] bits) {
-        this.bits = bits;
-    }
-
-    public int getBitsPos() {
-        return bitsPos;
-    }
-
-    public void setBitsPos(int bitsPos) {
-        this.bitsPos = bitsPos;
-    }
-
-    public long getBorder_L() {
-        return border_L;
-    }
-
-    public void setBorder_L(long border_L) {
-        this.border_L = border_L;
-    }
-
-    public long getBorder_H() {
-        return border_H;
-    }
-
-    public void setBorder_H(long border_H) {
-        this.border_H = border_H;
-    }
-
-    public List<Boolean> getEncodedBits() {
-        return encodedBits;
-    }
-
-    public void setEncodedBits(List<Boolean> encodedBits) {
-        this.encodedBits = encodedBits;
-    }
-
-    public List<Integer> getDecodedBytes() {
-        return decodedBytes;
-    }
-
-    public void setDecodedBytes(List<Integer> decodedBytes) {
-        this.decodedBytes = decodedBytes;
-    }
-
-    public FileInputStream getFileInputStream() {
-        return fileInputStream;
-    }
-
-    public void setFileInputStream(FileInputStream fileInputStream) {
-        this.fileInputStream = fileInputStream;
-    }
-
-    public FileOutputStream getFileOutputStream() {
-        return fileOutputStream;
-    }
-
-    public void setFileOutputStream(FileOutputStream fileOutputStream) {
-        this.fileOutputStream = fileOutputStream;
-    }
-
-    public ArithmeticCode(String name1, String name2) throws FileNotFoundException {
-        setFileInputStream(new FileInputStream(name1));
-        setFileOutputStream(new FileOutputStream(name2));
-    }
-
-    public void code_char(int c) {
+    private void code_char(int c) {
         long range = border_H - border_L + 1;
         border_H = border_L + range * calc_summ(freq, c) / calc_summ(freq, END) - 1;
         border_L = border_L + range * calc_summ(freq, c - 1) / calc_summ(freq, END);
@@ -152,13 +54,35 @@ public class ArithmeticCode {
         increment(freq, c);
     }
 
-    public void outputBit(boolean bit) {
+    private void outputBit(boolean bit) {
         encodedBits.add(bit);
         for (; add_bits > 0; add_bits--)
             encodedBits.add(!bit);
     }
 
-    public int decode_char() {
+    public int[] decode(int[] bits) {
+        freq = build_tree(END + 1);
+        this.bits = bits;
+        decodedBytes = new ArrayList<>();
+        value = 0;
+        for (bitsPos = 0; bitsPos < BITS; bitsPos++)
+            value = (value << 1) + (bitsPos < bits.length ? bits[bitsPos] : 0);
+        border_L = 0;
+        border_H = (1 << BITS) - 1;
+        while (true) {
+            int c = decode_char();
+            if (c == END)
+                break;
+            decodedBytes.add(c);
+            increment(freq, c);
+        }
+        int[] bytes = new int[decodedBytes.size()];
+        for (int i = 0; i < bytes.length; i++)
+            bytes[i] = decodedBytes.get(i);
+        return bytes;
+    }
+
+    private int decode_char() {
         int cum = (int) (((value - border_L + 1) * calc_summ(freq, END) - 1) / (border_H - border_L + 1));
         int c = upper_bound(freq, cum);
         long range = border_H - border_L + 1;
@@ -182,7 +106,7 @@ public class ArithmeticCode {
         return c;
     }
 
-    public int[] build_tree(int num) {
+    private int[] build_tree(int num) {
         int[] data = new int[num];
         for (int i = 0; i < num; i++) {
             ++data[i];
@@ -193,7 +117,7 @@ public class ArithmeticCode {
         return data;
     }
 
-    public void increment(int[] t, int i) {
+    private void increment(int[] t, int i) {
         for (; i < t.length; i |= i + 1)
             ++t[i];
     }
@@ -205,7 +129,7 @@ public class ArithmeticCode {
         return summ;
     }
 
-    private static int upper_bound(int[] t, int sum) {
+    private int upper_bound(int[] t, int sum) {
         int position = -1;
         for (int blockSize = Integer.highestOneBit(t.length); blockSize != 0; blockSize >>= 1) {
             int nextPos = position + blockSize;
@@ -217,16 +141,14 @@ public class ArithmeticCode {
         return position + 1;
     }
 
-    public byte[] encodeToByteArray(int[] bits) {
+    byte[] encodeToByteArray(int[] bits) {
         BitSet bitSet = new BitSet(bits.length);
-        for (int index = 0; index < bits.length; index++) {
+        for (int index = 0; index < bits.length; index++)
             bitSet.set(index, bits[index] > 0);
-        }
-
         return bitSet.toByteArray();
     }
 
-    public int[] encodeToBitArray(byte[] in_bytes) {
+    int[] encodeToBitArray(byte[] in_bytes) {
         int[] res = new int[in_bytes.length * 8];
         int counter = 0;
         for (int data : in_bytes) {

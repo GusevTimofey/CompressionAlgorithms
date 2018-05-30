@@ -6,13 +6,14 @@ import javafx.stage.FileChooser;
 
 import java.awt.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class GUI extends Component {
     private String firstFile;
     private String secondFile;
+    private ArithmeticCode arithmeticCode = new ArithmeticCode();
 
     @FXML
     private TextField InputFile;
@@ -60,7 +61,7 @@ public class GUI extends Component {
     }
 
     @FXML
-    private void printDecoderLength(byte[] a) {
+    private void printDecodedFileLength(int[] a) {
         decodedLength.setText(String.valueOf(a.length) + " bytes");
     }
 
@@ -91,73 +92,43 @@ public class GUI extends Component {
 
     @FXML
     private void doCode() throws IOException {
-        ArithmeticCode coder = new ArithmeticCode(firstFile, secondFile);
-        byte[] a = coder.getFileInputStream().readAllBytes();
-        coder.getFileInputStream().close();
-        printInputFileLength(a);
+        FileInputStream fileInputStream = new FileInputStream(firstFile);
+        FileOutputStream fileOutputStream = new FileOutputStream(secondFile);
 
-        int[] b = new int[a.length];
-        for (int i = 0; i < a.length; i++)
-            b[i] = Byte.toUnsignedInt(a[i]);
+        byte[] inputData = fileInputStream.readAllBytes();
+        fileInputStream.close();
+        printInputFileLength(inputData);
 
-        coder.setEncodedBits(new ArrayList<>());
-        coder.setBorder_L(0);
-        coder.setBorder_H((1 << coder.getBITS()) - 1);
-        coder.setAdd_bits(0);
-        coder.setFreq(coder.build_tree(coder.getEND() + 1));
-        for (int k : b)
-            coder.code_char(k);
-        coder.code_char(coder.getEND());
-        coder.outputBit(true);
+        int[] b = new int[inputData.length];
+        for (int i = 0; i < inputData.length; i++)
+            b[i] = Byte.toUnsignedInt(inputData[i]);
 
-        int[] result = new int[coder.getEncodedBits().size()];
-        for (int i = 0; i < result.length; i++)
-            result[i] = coder.getEncodedBits().get(i) ? 1 : 0;
-        byte[] encodedBytes = coder.encodeToByteArray(result);
+        int[] encodedBits = arithmeticCode.encode(b);
+        byte[] encodedBytes = arithmeticCode.encodeToByteArray(encodedBits);
 
-        coder.getFileOutputStream().write(encodedBytes);
-        coder.getFileOutputStream().close();
+        fileOutputStream.write(encodedBytes);
+        fileOutputStream.close();
         printCodedLength(encodedBytes);
         printCoderDone();
-        printPercentsOfCompression(a, encodedBytes);
+        printPercentsOfCompression(inputData, encodedBytes);
     }
 
     @FXML
     private void doDecode() throws IOException {
-        ArithmeticCode decoder = new ArithmeticCode(firstFile, secondFile);
-        byte[] a = decoder.getFileInputStream().readAllBytes();
-        decoder.getFileInputStream().close();
-        int[] b = decoder.encodeToBitArray(a);
+        FileInputStream fileInputStream = new FileInputStream(firstFile);
+        FileOutputStream fileOutputStream = new FileOutputStream(secondFile);
 
-        decoder.setFreq(decoder.build_tree(decoder.getEND() + 1));
-        decoder.setBits(b);
-        decoder.setDecodedBytes(new ArrayList<>());
-        decoder.setValue(0);
-        int[] bits = decoder.getBits();
-        for (int i = 0; i < decoder.getBITS(); i++)
-            decoder.setValue((decoder.getValue() << 1) + (i < bits.length ? bits[i] : 0));
+        byte[] inputData = fileInputStream.readAllBytes();
+        fileInputStream.close();
+        int[] b = arithmeticCode.encodeToBitArray(inputData);
+        int[] result = arithmeticCode.decode(b);
 
-        decoder.setBorder_L(0);
-        decoder.setBorder_H((1 << decoder.getBITS()) - 1);
-        while (true) {
-            int c = decoder.decode_char();
-            if (c == decoder.getEND())
-                break;
-            decoder.getDecodedBytes().add(c);
-            decoder.increment(decoder.getFreq(), c);
-        }
-
-        int[] bytes = new int[decoder.getDecodedBytes().size()];
-        for (int i = 0; i < bytes.length; i++)
-            bytes[i] = decoder.getDecodedBytes().get(i);
-
-        FileOutputStream fileOutputStream = decoder.getFileOutputStream();
-        for (int i = 0; i < bytes.length; i++)
-            fileOutputStream.write(bytes[i]);
+        for (int i = 0; i < result.length; i++)
+            fileOutputStream.write(result[i]);
 
         fileOutputStream.close();
-        decoder.getFileOutputStream().close();
-//        printDecoderLength(bytes);
+
+        printDecodedFileLength(result);
         printDecoderDone();
 
     }
